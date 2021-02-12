@@ -2,15 +2,16 @@
     include ('common.php');
     outputHeader("Welcome at Middlesex Electronics!");
     outputBannerNavigation("Home");
-
-    require __DIR__ . '/vendor/autoload.php';
-    $mongoClient = (new MongoDB\Client);
-    $db = $mongoClient->ecommerce;
-    
-    //Find all products
-    $products = $db->Products->find();
-
  ?>
+
+ <body onload="load_prod(), loadBasket()">
+
+ <span style="font-size:30px;cursor:pointer; float: right;" onclick="openNav()">&#x1F6CD; Basket</span>
+
+ <div id="mySidenav" class="sidenav">
+		<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+</div>
+
 
 <div class = "shop-containerr">
 
@@ -33,60 +34,47 @@
 </div>	
 
         <table id="table"></table>
-		<div id="basketDiv"></div>
 </div>
 
 <script>
-    window.onload = load_prod;
-	window.onload = loadBasket;
+
 
 	let totalPrice = 0;
 
-    function output_products(request){
+	function output_products(request){
 	document.getElementById("table").innerHTML="";
-	let productsJSONarray = request.responseText;	
-	let productsArray = JSON.parse(productsJSONarray);	
-	let arr = productsArray.length/3;
-	let no_of_rows = Math.ceil(arr);
-	let counter = 0;
+	let product = JSON.parse(request.responseText);	
 	let t = document.getElementById("table");
-	for (let i = 0 ; i < no_of_rows; i++){		
+	
 		let newRow = t.insertRow(t.length);// create a new row
-		for (let x = 0 ; x < 5; x++){
+		for (let i = 0 ; i < product.length; i++){
+			
+			let productId = product[i]._id.$oid;
+			let productName = product[i].Title;
+			let productPrice = product[i].Price;
+			let productImage = product[i].Image;
 
-			//delete
-			let x1 = "product_" + counter;
-			let x2 = "product_price" + counter;
-			//
 			let cell = newRow.insertCell();
-			//
-			cell.setAttribute("id", x1);
-			//
-			cell.innerHTML ='<div class="small-containerr">'+
-                                        '<div class="col-4">'+
-                                        '<div class="shop-product-container">'+
-                                        '<div class="shop-product-box">'+
-                                        '<div class="shop-product-img">'+
-                                        '<button  onclick="add_to_basket('+ counter + ')" class="add-cart">'+
-                                        '<i class="fas fa-shopping-cart"></i>'+
-                                        '</button>'+
-										'<img src='+ productsArray[counter].Image +'>' +
-                                        '</div>'+
-                                        '</div>'+
-                                        '<div class="shop-product-details">'+
-                                        '<h4 id="name" class="Newp-name">' + productsArray[counter].Title +'</h4>'+
-                                        '<h4 id="price" class="p-price">' + productsArray[counter].Price + '£</h4>'+
-                                        '</div>'+
-                                        '</div>'+
-                                        '</div>'+
-                                        '</div>';
-			counter++;
-			if(counter >= productsArray.length){						
-				x = 5;
-				i = no_of_rows;
-			}//end if				
-		}//end of cell
-	}//end of no_of_rows	
+			
+			cell.innerHTML = '<div class="small-containerr">'+
+                        '<div class="col-4">'+
+                        '<div class="shop-product-container">'+
+                        '<div class="shop-product-box">'+
+                        '<div class="shop-product-img">'+
+                        '<button  onclick= \'addToBasket("'+productId+'")\' class="add-cart">'+
+                        '<i class="fas fa-shopping-cart"></i>'+
+                        '</button>'+
+						'<img src='+ productImage +'>' +
+                        '</div>'+
+                        '</div>'+
+                        '<div class="shop-product-details">'+
+                     	'<h4 id="name" class="Newp-name">' + productName +'</h4>'+
+                        '<h4 id="price" class="p-price">' +  productPrice + '£</h4>'+
+                        '</div>'+
+                        '</div>'+
+                        '</div>'+
+                        '</div>';			
+		}
 }
 
     function load_prod(){
@@ -181,6 +169,14 @@ function search_prod(){
 	let no = 3;
 	let search = document.getElementById("search-p").value;
 	request.send("_condition=" + no + "&_search=" +search);
+}
+
+function openNav() {
+    document.getElementById("mySidenav").style.width = "350px";
+}
+
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
 }
 
  
