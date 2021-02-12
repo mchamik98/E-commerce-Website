@@ -102,7 +102,7 @@
         $product = $db->Products->find(
             [],
             [
-                'sort' => ['Price' => -1],
+                'sort' => ['Title' => -1],
             ]
         );
 
